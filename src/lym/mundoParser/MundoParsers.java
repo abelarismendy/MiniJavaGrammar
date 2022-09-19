@@ -1,6 +1,8 @@
 package lym.mundoParser;
 
 import java.util.*;
+
+import lym.languages.javita.Javita;
 //import language definition
 
 public class MundoParsers {
@@ -18,7 +20,7 @@ public class MundoParsers {
 		
 	    //parsers.add("PARSER NAME");
 	    
-		parsers.add("PARSER Expresiones");
+		parsers.add("Javita");
 	    currentParser =  0;
 	}
 	
@@ -27,6 +29,10 @@ public class MundoParsers {
 		return new ParserCAML(System.in);
 	}
 	*/
+	
+	public Javita getJavita(){
+		return new Javita(System.in);
+	}
 	
 	
 	public String getStringCurrentParser(){
@@ -65,6 +71,19 @@ public class MundoParsers {
 				}
 		}
 		*/
+		
+		if(parsers.get(currentParser).equals("Javita")) {
+			Javita javita = getJavita();
+			javita.ReInit(new java.io.StringReader(texto));
+			try {
+				javita.classDef();
+				resp = new String("OK\n");
+			} catch (Exception e) {
+				resp = new String("Error de Sintaxis: "+e.getMessage());
+			} catch (Error e) {
+				resp = new String("Error Lexico: "+e.getMessage());
+			}
+		}
 		return "\n SISTEMA " + parsers.get(currentParser) + ": " + resp + "\n";
 	}
 

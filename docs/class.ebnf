@@ -1,0 +1,16 @@
+
+class ::= 'class' className 'extends' className '{' classBody '}';
+className ::= [A-Z][a-zA-Z0-9]*|'Object';
+identifier ::= [a-zA-Z][a-zA-Z0-9]*;
+classBody ::= (classMember)* classConstructor (classMember)*;
+classMember ::= classMethod | classAttribute;
+classAttribute ::= className identifier ';';
+classMethod ::= className identifier '(' methodParameters ')' '{' methodBody '}';
+methodParameters ::= (className identifier (',' className identifier)*)?;
+methodBody ::= 'return new' className '(' objectParameters ')' ';';
+objectParameters ::= (objectParameter (',' objectParameter)*)?;
+objectParameter ::= identifier | 'this.'identifier | methodCall;
+methodCall ::= identifier '.' identifier '(' (identifier (',' identifier)*)? ')';
+classConstructor ::= className '(' methodParameters ')' '{' constructorBody '}';
+constructorBody ::= 'super();'(constructorStatement)*;
+constructorStatement ::= 'this.'identifier '=' identifier ';';

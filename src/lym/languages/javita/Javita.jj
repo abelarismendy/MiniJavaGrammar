@@ -1,0 +1,107 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;}PARSER_BEGIN(Javita)package lym.languages.javita;
+
+public class Javita{  public static void main(String args []) throws ParseException  {    Javita parser = new Javita(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        Javita.classDef();
+        System.out.print("OK.\n");
+      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        Javita.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(Javita)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN :{  < EQUALS : "=" >
+/*| < OBJ : "Object">*/
+| < CLASS : "class">
+| < EXTENDS : "extends">
+| < RETURN : "return">
+| < NEW : "new">
+| < SUPER: "super">
+| < THIS: "this" >
+| < OPAREN: "(" >
+| < CPAREN: ")" >
+| < OBRACKET: "{" >
+| < CBRACKET: "}" >
+| < DOT: "." >
+| < COMMA: "," >
+| < SEMICOLON: ";" >}
+TOKEN :{
+  < NAME : < UPPER >(< UPPER > | < LOWER > | < DIGIT >) * >
+| < IDENTIFIER:(< UPPER > | < LOWER >)(< UPPER > | < LOWER > | < DIGIT >) * >
+| < #UPPER : ["A"-"Z"] >
+| < #LOWER : ["a"-"z"]>
+| < #DIGIT : ["0"-"9"] >  }
+void classDef():
+{}
+{
+  < CLASS > < NAME > < EXTENDS > < NAME > < OBRACKET > classBody() < CBRACKET > }
+
+void classBody():
+{}{
+  (LOOKAHEAD(2) classMembers())*  < NAME > classConstructor() (LOOKAHEAD(2) classMembers())*}
+
+void classMembers():
+{}
+{
+  < NAME > < IDENTIFIER > classMember()
+}
+
+void classMember():
+{}
+{
+  classMethod() | classAttribute()}
+
+void classAttribute():
+{}
+{
+  < SEMICOLON >  }
+void classMethod():
+{}
+{
+  < OPAREN > methodParameters() < CPAREN >
+  < OBRACKET > methodBody() < CBRACKET >
+}
+
+void methodParameters():
+{}
+{
+  (< NAME > < IDENTIFIER > (< COMMA > < NAME > < IDENTIFIER > )*)?
+}
+
+void methodBody():
+{}
+{
+  < RETURN > < NEW > < NAME > < OPAREN > objectParameters() < CPAREN > < SEMICOLON >
+}
+
+void objectParameters():
+{}
+{
+  (objectParameter() (< COMMA > objectParameter())*)?
+}
+
+void objectParameter():
+{}
+{
+  < IDENTIFIER >(methodCall())? | < THIS > < DOT > < IDENTIFIER > 
+}
+
+void methodCall():
+{}
+{
+  < DOT > < IDENTIFIER > < OPAREN >
+  (< IDENTIFIER > (< COMMA > < IDENTIFIER >)*)? < CPAREN >
+}
+
+void classConstructor():
+{}
+{
+  < OPAREN > methodParameters() < CPAREN >
+  < OBRACKET > constructorBody() < CBRACKET >
+}
+
+void constructorBody():
+{}
+{
+  < SUPER > < OPAREN > < CPAREN > < SEMICOLON > (constructorStatement())*
+}
+
+void constructorStatement():
+{}
+{
+  < THIS > < DOT > < IDENTIFIER > < EQUALS > < IDENTIFIER > < SEMICOLON >
+}
