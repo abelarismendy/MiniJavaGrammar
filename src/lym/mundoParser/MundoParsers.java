@@ -13,6 +13,8 @@ public class MundoParsers {
 	// Parser que se esta usando
 	private int currentParser;
 	
+	static Javita javita;
+	
 	
 	public  MundoParsers () {
   	
@@ -21,6 +23,7 @@ public class MundoParsers {
 	    //parsers.add("PARSER NAME");
 	    
 		parsers.add("Javita");
+		javita = getJavita();
 	    currentParser =  0;
 	}
 	
@@ -73,7 +76,7 @@ public class MundoParsers {
 		*/
 		
 		if(parsers.get(currentParser).equals("Javita")) {
-			Javita javita = getJavita();
+			/*Javita javita = getJavita();*/
 			javita.ReInit(new java.io.StringReader(texto));
 			try {
 				javita.classDef();
