@@ -1,0 +1,9 @@
+class Abel extends Troll {
+    Veneco true;
+    Robar(){
+        super(); this.robar=false;
+    }
+    Xd marica(Mc troll){
+        return new Vida(xd, this.algo, a.abel(xd, abel, hola));
+    }
+}
