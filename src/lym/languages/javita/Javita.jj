@@ -1,107 +1,152 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */options{  static = true;}PARSER_BEGIN(Javita)package lym.languages.javita;
+ */
+options
+{
+  static = true;
+}
 
-public class Javita{  public static void main(String args []) throws ParseException  {    Javita parser = new Javita(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        Javita.classDef();
+PARSER_BEGIN(Javita)
+package lym.languages.javita;
+import java.util.*;
+
+public class Javita
+{
+  static ArrayList<String > varNames = new ArrayList<String>();
+  static HashMap<String, Integer > globalScope = new HashMap<String, Integer>();
+  public static void main(String args []) throws ParseException
+  {
+    Javita parser = new Javita(System.in);
+    while (true)
+    {
+      System.out.println("Reading from standard input...");
+      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
+      try
+      {
+        Javita.program();
+        System.out.print(varNames);
         System.out.print("OK.\n");
-      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        Javita.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(Javita)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN :{  < EQUALS : "=" >
-/*| < OBJ : "Object">*/
-| < CLASS : "class">
-| < EXTENDS : "extends">
-| < RETURN : "return">
-| < NEW : "new">
-| < SUPER: "super">
-| < THIS: "this" >
-| < OPAREN: "(" >
-| < CPAREN: ")" >
-| < OBRACKET: "{" >
-| < CBRACKET: "}" >
-| < DOT: "." >
-| < COMMA: "," >
-| < SEMICOLON: ";" >}
-TOKEN :{
-  < NAME : < UPPER >(< UPPER > | < LOWER > | < DIGIT >) * >
-| < IDENTIFIER:(< UPPER > | < LOWER >)(< UPPER > | < LOWER > | < DIGIT >) * >
-| < #UPPER : ["A"-"Z"] >
-| < #LOWER : ["a"-"z"]>
-| < #DIGIT : ["0"-"9"] >  }
-void classDef():
-{}
-{
-  < CLASS > < NAME > < EXTENDS > < NAME > < OBRACKET > classBody() < CBRACKET > }
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        Javita.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+PARSER_END(Javita)
 
-void classBody():
-{}{
-  (LOOKAHEAD(2) classMembers())*  < NAME > classConstructor() (LOOKAHEAD(2) classMembers())*}
-
-void classMembers():
-{}
+SKIP:
 {
-  < NAME > < IDENTIFIER > classMember()
+		" "
+	|	"\r"
+	|	"\t"
+	| 	"\n"
+}
+/*
+TOKEN:
+{
+			< MOV:  "Mov" >
+		| 	< RIGHT: "RIGHT" >
+		| 	< PUT: "Put" >
+		| 	< PICK: "Pick" >
+		|  	< POP: "Pop" >
+		| 	< GO: "GO" >
+        |  	< HOP:  "HOP" >		
+
+}*/
+
+TOKEN: /*Comandos*/
+{
+
+  	< WALK: "walk" >
+| 	< JUMP: "jump" >
+| 	< JUMPTO: "jumpTo" >
+| 	< VEER: "veer" >
+| 	< LOOK: "look" >
+| 	< DROP: "drop" >
+|	< GRAB: "grab" >
+| 	< GET: "get" >
+| 	< FREE: "free" >
+| 	< POP: "pop" >
 }
 
-void classMember():
-{}
+/*TOKEN:
 {
-  classMethod() | classAttribute()}
+			< BALLOONS:  "BALLOONS" >
+		|	< CHIPS:     "CHIPS"  >	
 
-void classAttribute():
-{}
+}*/
+
+TOKEN: /* Condiciones */
 {
-  < SEMICOLON >  }
-void classMethod():
-{}
-{
-  < OPAREN > methodParameters() < CPAREN >
-  < OBRACKET > methodBody() < CBRACKET >
+	< ISFACING: "isfacing" >
+|	< ISVALID: "isValid"  >
+|	< CANWALK: "canWalk"  >
+|	< NOT: "not"  >	
 }
 
-void methodParameters():
-{}
+TOKEN: /*LOGIC */
 {
-  (< NAME > < IDENTIFIER > (< COMMA > < NAME > < IDENTIFIER > )*)?
+		< PROG: "PROG" >
+	| 	< GORP: "GORP" >
+	| 	< PROC: "PROC" >
+	|   < CORP: "CORP" >
+	|  	< VAR: "VAR" >
+}
+TOKEN :
+{
+    < CONSTANT : (< DIGIT >)+ >
+|	< WORD: (< LMINUS > | < LMAYUS >)(< LMINUS > | < LMAYUS > | < DIGIT >)* >
+|   < #DIGIT : [ "0"-"9" ] >
+|   < #LMINUS : ["a"-"z"] >
+|   < #LMAYUS : ["A"-"Z"] >
 }
 
-void methodBody():
-{}
+
+TOKEN:
 {
-  < RETURN > < NEW > < NAME > < OPAREN > objectParameters() < CPAREN > < SEMICOLON >
+	< ASSIGNMENT : ":=" >
+|	< PI : "(" >
+|	< PD : ")" >
+|	< CBL : "{" >
+|	< CBR : "}" >
+|	< SC : ";" >
+|	< CM : "," >
 }
 
-void objectParameters():
-{}
+
+void program():
 {
-  (objectParameter() (< COMMA > objectParameter())*)?
+}
+{
+	< PROG > < CBL > varDef()< CBR > < GORP >
 }
 
-void objectParameter():
-{}
+void varDef():
 {
-  < IDENTIFIER >(methodCall())? | < THIS > < DOT > < IDENTIFIER > 
+  
+}
+{
+	< VAR > variable() ( < CM > variable())* < SC >
 }
 
-void methodCall():
-{}
+void variable():
 {
-  < DOT > < IDENTIFIER > < OPAREN >
-  (< IDENTIFIER > (< COMMA > < IDENTIFIER >)*)? < CPAREN >
+  Token t;
 }
-
-void classConstructor():
-{}
 {
-  < OPAREN > methodParameters() < CPAREN >
-  < OBRACKET > constructorBody() < CBRACKET >
-}
-
-void constructorBody():
-{}
-{
-  < SUPER > < OPAREN > < CPAREN > < SEMICOLON > (constructorStatement())*
-}
-
-void constructorStatement():
-{}
-{
-  < THIS > < DOT > < IDENTIFIER > < EQUALS > < IDENTIFIER > < SEMICOLON >
+	t = < WORD >
+	{
+	  	
+	  	varNames.add(t.image);
+	}
 }

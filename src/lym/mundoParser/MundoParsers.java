@@ -79,7 +79,7 @@ public class MundoParsers {
 			/*Javita javita = getJavita();*/
 			javita.ReInit(new java.io.StringReader(texto));
 			try {
-				javita.classDef();
+				javita.program();
 				resp = new String("OK\n");
 			} catch (Exception e) {
 				resp = new String("Error de Sintaxis: "+e.getMessage());
