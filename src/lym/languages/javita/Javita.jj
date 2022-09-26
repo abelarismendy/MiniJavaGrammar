@@ -189,14 +189,14 @@ void globalCommand(ArrayList <String > localScope):
 {
 }
 {
-  (command(localScope))*
+	command(localScope) (< SC > command(localScope))*
 }
 
 void command(ArrayList <String > localScope):
 {
 }
 {
-  posibleCommands(localScope) < SC >
+  (posibleCommands(localScope) | jumpTo(localScope) )
 }
 
 void posibleCommands(ArrayList <String > localScope):
@@ -206,23 +206,43 @@ void posibleCommands(ArrayList <String > localScope):
   (
     < WALK > | < DROP > | < GRAB > | < GET > | < FREE > | < POP >
   )
-  < PI > parameter(localScope) < PD >
+  < PI > parameter(localScope, true) < PD >
 }
 
 
-void parameter(ArrayList <String > localScope):
+void parameter(ArrayList <String > localScope, boolean allowInt):
 {
   Token t;
+  Token d;
 }
 {
-  < CONSTANT >
-  | t=< WORD >
+  t = < WORD >
   {
-    if (varNames.contains(t.image) || localScope.contains(t.image)){
-      System.out.println("Variable " + t.image + " declarada");
+    if (localScope.contains(t.image) || varNames.contains(t.image) || globalScope.containsKey(t.image)){
+      // System.out.println("OK");
+      // System.out.println(t.image);
     } else {
-      System.out.println("Variable " + t.image + " no declarada");
+      System.out.println("NOK");
+      System.out.println(t.image);
+    }
+  }
+  | d = < CONSTANT >
+  {
+    if (allowInt){
+      // System.out.println("OK");
+      // System.out.println(d.image);
+    } else {
+      System.out.println("NOK");
+      System.out.println(d.image);
     }
   }
 }
 
+
+void jumpTo(ArrayList <String > localScope):
+{
+  Token t;
+}
+{
+  < JUMPTO > < PI > parameter(localScope, true) < CM > parameter(localScope, true) < PD >
+}
