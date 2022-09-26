@@ -217,7 +217,7 @@ void command(ArrayList <String > localScope):
 {
 }
 {
-  (posibleCommands(localScope) | jumpTo(localScope) | veer() | look())
+  (posibleCommands(localScope) | jumpTo(localScope) | veer() | look() | walk(localScope))
 }
 
 void posibleCommands(ArrayList <String > localScope):
@@ -225,7 +225,7 @@ void posibleCommands(ArrayList <String > localScope):
 }
 {
   (
-    < WALK > | < DROP > | < GRAB > | < GET > | < FREE > | < POP >
+    < DROP > | < GRAB > | < GET > | < FREE > | < POP >
   )
   < PI > parameter(localScope, true) < PD >
 }
@@ -296,4 +296,18 @@ void look():
 {}
 {
   < LOOK > < PI > posibleOrientations() < PD >
+}
+
+void walk(ArrayList <String > localScope):
+{}
+{
+  < WALK > < PI > walksTypes(localScope) < PD >
+}
+
+void walksTypes(ArrayList <String > localScope):
+{}
+{
+  parameter(localScope, true)
+  | posibleWalks() < CM > parameter(localScope, true)
+  | posibleOrientations() < CM > parameter(localScope, true)
 }
