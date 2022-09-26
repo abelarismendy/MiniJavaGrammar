@@ -128,6 +128,20 @@ TOKEN: /*LOGIC */
 	|   < CORP: "CORP" >
 	|  	< VAR: "VAR" >
 }
+
+TOKEN:/*Control structures */
+{
+  < IF: "if" >
+| < ELSE: "else" >
+| < WHILE: "while" >
+| < FI: "fi" >
+| < DO: "do" >
+| < OD: "od" >
+| < REPEAT: "repeatTimes" >
+| < PER: "per" >
+| < PICK: "pick" >
+}
+
 TOKEN :
 {
     < CONSTANT : (< DIGIT >)+ >
@@ -217,7 +231,15 @@ void command(ArrayList <String > localScope):
 {
 }
 {
-  (posibleCommands(localScope) | jumpTo(localScope) | veer() | look() | walk(localScope))
+  (
+  posibleCommands(localScope)
+  | jumpTo(localScope)
+  | veer()
+  | look()
+  | walk(localScope)
+  | assignment(localScope)
+  | ifBlock(localScope)
+  )
 }
 
 void posibleCommands(ArrayList <String > localScope):
@@ -310,4 +332,60 @@ void walksTypes(ArrayList <String > localScope):
   parameter(localScope, true)
   | posibleWalks() < CM > parameter(localScope, true)
   | posibleOrientations() < CM > parameter(localScope, true)
+}
+
+void assignment(ArrayList <String > localScope):
+{}
+{
+  parameter(localScope, false) < ASSIGNMENT > < CONSTANT >
+}
+
+void terminalBlock(ArrayList <String > localScope):
+{}
+{
+  < CBL > globalCommand(localScope) < CBR >
+}
+
+void validList():
+{}
+{
+  < WALK >
+  | < JUMP >
+  | < GRAB >
+  | < DROP >
+  | < PICK >
+  | < FREE >
+  | < POP >
+}
+
+void isFacing():
+{}
+{
+  < ISFACING > < PI > posibleOrientations() < PD >
+}
+
+void isValid(ArrayList <String > localScope):
+{}
+{
+  < ISVALID > < PI > validList() < CM > parameter(localScope, true) < PD >
+}
+
+void canWalk(ArrayList <String > localScope):
+{}
+{
+  < CANWALK > < PI > (posibleOrientations()| posibleWalks()) < CM > parameter(localScope, true) < PD >
+}
+
+void condition(ArrayList <String > localScope):
+{}
+{
+  isFacing()
+  | isValid(localScope)
+  | canWalk(localScope)
+}
+
+void ifBlock(ArrayList <String > localScope):
+{}
+{
+  < IF > < PI > condition(localScope) < PD > terminalBlock(localScope) ( < ELSE > terminalBlock(localScope) )? < FI >
 }
