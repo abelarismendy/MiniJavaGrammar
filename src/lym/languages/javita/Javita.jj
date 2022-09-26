@@ -1,4 +1,4 @@
-/**
+	/**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
  */
 options
@@ -24,6 +24,9 @@ public class Javita
       System.out.print("Enter an expression like \"1+(2+3)*4;\" :");
       try
       {
+        varNames.clear();
+        procNames.clear();
+        globalScope.clear();
         Javita.program();
         System.out.print(varNames);
         System.out.print(procNames);
@@ -130,7 +133,7 @@ void program():
 {
 }
 {
-	< PROG > < CBL > (varDef())? procDef() < CBR > < GORP >
+	< PROG > (varDef())? procDef() < GORP >
 }
 
 void varDef():
@@ -141,7 +144,7 @@ void varDef():
 	< VAR > saveGlobalNamesxType("VAR")( < CM > saveGlobalNamesxType("VAR"))* < SC >
 }
 
-void saveGlobalNamesxType(String type):
+Token saveGlobalNamesxType(String type):
 {
   Token t;
 }
@@ -152,7 +155,8 @@ void saveGlobalNamesxType(String type):
 	  		varNames.add(t.image);
 	 	} else if (type == "PROC"){
 	 	  	procNames.add(t.image);
-	 	} 
+	 	}
+	 	return t;
 	}
 }
 
@@ -170,13 +174,55 @@ void saveLocalNamesxType(ArrayList <String > localScope): /*Arreglar*/
 void procDef():
 {
 	ArrayList <String > localScope = new ArrayList<String>();
+	Token scope;
 }
 {
-	< PROC > saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType(localScope) (< CM > saveLocalNamesxType(localScope))* < PD >
+	< PROC > scope=saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType(localScope) (< CM > saveLocalNamesxType(localScope))* < PD >
+	< CBL > globalCommand(localScope) < CBR > < CORP >
 	{
+	  System.out.println(scope.image);
 	  System.out.println(localScope);
 	}
 }
 
+void globalCommand(ArrayList <String > localScope):
+{
+}
+{
+  (command(localScope))*
+}
 
+void command(ArrayList <String > localScope):
+{
+}
+{
+  posibleCommands(localScope) < SC >
+}
+
+void posibleCommands(ArrayList <String > localScope):
+{
+}
+{
+  (
+    < WALK > | < DROP > | < GRAB > | < GET > | < FREE > | < POP >
+  )
+  < PI > parameter(localScope) < PD >
+}
+
+
+void parameter(ArrayList <String > localScope):
+{
+  Token t;
+}
+{
+  < CONSTANT >
+  | t=< WORD >
+  {
+    if (varNames.contains(t.image) || localScope.contains(t.image)){
+      System.out.println("Variable " + t.image + " declarada");
+    } else {
+      System.out.println("Variable " + t.image + " no declarada");
+    }
+  }
+}
 
