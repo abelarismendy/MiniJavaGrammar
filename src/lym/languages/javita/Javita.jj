@@ -84,6 +84,27 @@ TOKEN: /*Comandos*/
 | 	< POP: "pop" >
 }
 
+TOKEN: /*Directions */
+{
+  < AROUND: "around" >
+| < LEFT: "left" >
+| < RIGHT: "right" >
+}
+
+TOKEN: /*Orientations */
+{
+  < NORTH: "north" >
+| < SOUTH: "south" >
+| < EAST: "east" >
+| < WEST: "west" >
+}
+
+TOKEN:/*Walks */
+{
+  < FRONT: "front" >
+| < BACK: "back" >
+}
+
 /*TOKEN:
 {
 			< BALLOONS:  "BALLOONS" >
@@ -196,7 +217,7 @@ void command(ArrayList <String > localScope):
 {
 }
 {
-  (posibleCommands(localScope) | jumpTo(localScope) )
+  (posibleCommands(localScope) | jumpTo(localScope) | veer() | look())
 }
 
 void posibleCommands(ArrayList <String > localScope):
@@ -245,4 +266,34 @@ void jumpTo(ArrayList <String > localScope):
 }
 {
   < JUMPTO > < PI > parameter(localScope, true) < CM > parameter(localScope, true) < PD >
+}
+
+void posibleDirections():
+{}
+{
+  < AROUND > | < LEFT > | < RIGHT >
+}
+
+void posibleOrientations():
+{}
+{
+  < NORTH > | < SOUTH > | < EAST > | < WEST >
+}
+
+void posibleWalks():
+{}
+{
+  < FRONT > | < BACK > | < LEFT > | < RIGHT >
+}
+
+void veer():
+{}
+{
+  < VEER > < PI > posibleDirections() < PD >
+}
+
+void look():
+{}
+{
+  < LOOK > < PI > posibleOrientations() < PD >
 }
