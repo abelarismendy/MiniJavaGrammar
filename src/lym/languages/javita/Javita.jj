@@ -13,6 +13,7 @@ import java.util.*;
 public class Javita
 {
   static ArrayList<String > varNames = new ArrayList<String>();
+  static ArrayList<String > procNames = new ArrayList<String>();
   static HashMap<String, Integer > globalScope = new HashMap<String, Integer>();
   public static void main(String args []) throws ParseException
   {
@@ -25,6 +26,7 @@ public class Javita
       {
         Javita.program();
         System.out.print(varNames);
+        System.out.print(procNames);
         System.out.print("OK.\n");
       }
       catch (Exception e)
@@ -128,7 +130,7 @@ void program():
 {
 }
 {
-	< PROG > < CBL > varDef()< CBR > < GORP >
+	< PROG > < CBL > (varDef())? procDef() < CBR > < GORP >
 }
 
 void varDef():
@@ -136,17 +138,44 @@ void varDef():
   
 }
 {
-	< VAR > variable() ( < CM > variable())* < SC >
+	< VAR > saveGlobalNamesxType("VAR")( < CM > saveGlobalNamesxType("VAR"))* < SC >
 }
 
-void variable():
+void saveGlobalNamesxType(String type):
 {
   Token t;
 }
 {
 	t = < WORD >
 	{
-	  	
-	  	varNames.add(t.image);
+	 	if (type == "VAR"){ 
+	  		varNames.add(t.image);
+	 	} else if (type == "PROC"){
+	 	  	procNames.add(t.image);
+	 	} 
 	}
 }
+
+void saveLocalNamesxType(String type, ArrayList <String > localScope): /*Arreglar*/
+{
+  Token t;
+}
+{
+	t = < WORD >
+	{
+	 	if (type == "VAR"){ 
+	  		varNames.add(t.image);
+	 	} else if (type == "PROC"){
+	 	  	procNames.add(t.image);
+	 	} 
+	}
+}
+
+void procDef():
+{}
+{
+	< PROC > saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType()
+}
+
+
+
