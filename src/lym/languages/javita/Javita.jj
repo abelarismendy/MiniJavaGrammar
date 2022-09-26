@@ -156,25 +156,26 @@ void saveGlobalNamesxType(String type):
 	}
 }
 
-void saveLocalNamesxType(String type, ArrayList <String > localScope): /*Arreglar*/
+void saveLocalNamesxType(ArrayList <String > localScope): /*Arreglar*/
 {
   Token t;
 }
 {
 	t = < WORD >
 	{
-	 	if (type == "VAR"){ 
-	  		varNames.add(t.image);
-	 	} else if (type == "PROC"){
-	 	  	procNames.add(t.image);
-	 	} 
+		localScope.add(t.image);
 	}
 }
 
 void procDef():
-{}
 {
-	< PROC > saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType()
+	ArrayList <String > localScope = new ArrayList<String>();
+}
+{
+	< PROC > saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType(localScope) (< CM > saveLocalNamesxType(localScope))* < PD >
+	{
+	  System.out.println(localScope);
+	}
 }
 
 
