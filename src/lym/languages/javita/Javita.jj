@@ -169,9 +169,10 @@ TOKEN:
 
 void program():
 {
+  ArrayList<String> localScope = new ArrayList<String>();
 }
 {
-	< PROG > (varDef())? (procDef())* < GORP >
+	< PROG > (varDef())? (procDef())* insBlock(localScope) < GORP >
 }
 
 void varDef():
@@ -218,11 +219,47 @@ void procDef():
 }
 {
 	< PROC > scope=saveGlobalNamesxType("PROC") < PI > (saveLocalNamesxType(localScope, scope.image) (< CM > saveLocalNamesxType(localScope, scope.image))*)? < PD >
-	< CBL > globalCommand(localScope) < CBR > < CORP >
+	insBlock(localScope) < CORP >
 	{
 	  System.out.println(scope.image);
 	  System.out.println(localScope);
 	}
+}
+
+void insBlock(ArrayList <String> localScope):
+{
+
+}
+{
+  < CBL > globalCommand(localScope) < CBR >
+}
+
+void rules(ArrayList <String> localScope):
+{
+  Token t;
+  Token p;
+  ArrayList <String> params = new ArrayList<String>();
+}
+{
+  t= < WORD > < PI > (p=parameter(localScope, true)
+  {
+    params.add(p.image);
+  }
+  (< CM > p=parameter(localScope, true)
+  {
+    params.add(p.image);
+  })* )? < PD >
+  {
+    if (procNames.contains(t.image)){
+      if (procParams.get(t.image) == params.size()){
+        System.out.println("Correcto");
+      } else {
+        System.out.println("Incorrecto, cantidad de parametros");
+      }
+    } else {
+      System.out.println("Incorrecto, no existe el procedimiento");
+    }
+  }
 }
 
 void globalCommand(ArrayList <String > localScope):
@@ -242,7 +279,12 @@ void command(ArrayList <String > localScope):
   | veer()
   | look()
   | walk(localScope)
-  | assignment(localScope)
+  |
+  (
+  LOOKAHEAD(2)
+  assignment(localScope)
+  | rules(localScope)
+  )
   | ifBlock(localScope)
   | whileBlock(localScope)
   | repeatBlock(localScope)
@@ -414,7 +456,7 @@ void ifBlock(ArrayList <String > localScope):
 void whileBlock(ArrayList <String> localScope):
 {}
 {
-  < WHILE > < PI > condition(localScope) < PD > < DO > terminalBlock(localScope) < OD >
+  < WHILE > < PI > ( not(localScope) | condition(localScope)) < PD > < DO > terminalBlock(localScope) < OD >
 }
 
 void repeatBlock(ArrayList <String> localScope):
@@ -423,8 +465,4 @@ void repeatBlock(ArrayList <String> localScope):
   < REPEAT > parameter(localScope, true) terminalBlock(localScope) < PER >
 }
 
-void insBlock(ArrayList <String> localScope):
-{}
-{
-  < IF >
-}
+
