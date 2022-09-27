@@ -14,6 +14,7 @@ public class Javita
 {
   static ArrayList<String > varNames = new ArrayList<String>();
   static ArrayList<String > procNames = new ArrayList<String>();
+  static HashMap<String, Integer> procParams = new HashMap<String, Integer>();
   static HashMap<String, Integer > globalScope = new HashMap<String, Integer>();
   public static void main(String args []) throws ParseException
   {
@@ -30,6 +31,8 @@ public class Javita
         Javita.program();
         System.out.print(varNames);
         System.out.print(procNames);
+        System.out.print(procParams);
+        System.out.print(globalScope);
         System.out.print("OK.\n");
       }
       catch (Exception e)
@@ -168,7 +171,7 @@ void program():
 {
 }
 {
-	< PROG > (varDef())? procDef() < GORP >
+	< PROG > (varDef())? (procDef())* < GORP >
 }
 
 void varDef():
@@ -190,12 +193,13 @@ Token saveGlobalNamesxType(String type):
 	  		varNames.add(t.image);
 	 	} else if (type == "PROC"){
 	 	  	procNames.add(t.image);
+        procParams.put(t.image, 0);
 	 	}
 	 	return t;
 	}
 }
 
-void saveLocalNamesxType(ArrayList <String > localScope): /*Arreglar*/
+void saveLocalNamesxType(ArrayList <String > localScope, String procN): /*Arreglar*/
 {
   Token t;
 }
@@ -203,6 +207,7 @@ void saveLocalNamesxType(ArrayList <String > localScope): /*Arreglar*/
 	t = < WORD >
 	{
 		localScope.add(t.image);
+    procParams.put(procN, procParams.get(procN) + 1);
 	}
 }
 
@@ -212,7 +217,7 @@ void procDef():
 	Token scope;
 }
 {
-	< PROC > scope=saveGlobalNamesxType("PROC") < PI > saveLocalNamesxType(localScope) (< CM > saveLocalNamesxType(localScope))* < PD >
+	< PROC > scope=saveGlobalNamesxType("PROC") < PI > (saveLocalNamesxType(localScope, scope.image) (< CM > saveLocalNamesxType(localScope, scope.image))*)? < PD >
 	< CBL > globalCommand(localScope) < CBR > < CORP >
 	{
 	  System.out.println(scope.image);
@@ -239,6 +244,8 @@ void command(ArrayList <String > localScope):
   | walk(localScope)
   | assignment(localScope)
   | ifBlock(localScope)
+  | whileBlock(localScope)
+  | repeatBlock(localScope)
   )
 }
 
@@ -253,7 +260,7 @@ void posibleCommands(ArrayList <String > localScope):
 }
 
 
-void parameter(ArrayList <String > localScope, boolean allowInt):
+Token parameter(ArrayList <String > localScope, boolean allowInt):
 {
   Token t;
   Token d;
@@ -264,6 +271,7 @@ void parameter(ArrayList <String > localScope, boolean allowInt):
     if (localScope.contains(t.image) || varNames.contains(t.image) || globalScope.containsKey(t.image)){
       // System.out.println("OK");
       // System.out.println(t.image);
+      return t;
     } else {
       System.out.println("NOK");
       System.out.println(t.image);
@@ -274,6 +282,7 @@ void parameter(ArrayList <String > localScope, boolean allowInt):
     if (allowInt){
       // System.out.println("OK");
       // System.out.println(d.image);
+      return d;
     } else {
       System.out.println("NOK");
       System.out.println(d.image);
@@ -335,9 +344,15 @@ void walksTypes(ArrayList <String > localScope):
 }
 
 void assignment(ArrayList <String > localScope):
-{}
 {
-  parameter(localScope, false) < ASSIGNMENT > < CONSTANT >
+  Token t;
+  Token n;
+}
+{
+  t=parameter(localScope, false) < ASSIGNMENT > n=< CONSTANT >
+  {
+    globalScope.put(t.image, Integer.parseInt(n.image));
+  }
 }
 
 void terminalBlock(ArrayList <String > localScope):
@@ -384,8 +399,32 @@ void condition(ArrayList <String > localScope):
   | canWalk(localScope)
 }
 
+void not(ArrayList <String > localScope):
+{}
+{
+  < NOT > < PI > condition(localScope) < PD >
+}
+
 void ifBlock(ArrayList <String > localScope):
 {}
 {
-  < IF > < PI > condition(localScope) < PD > terminalBlock(localScope) ( < ELSE > terminalBlock(localScope) )? < FI >
+  < IF > < PI > (not(localScope) | condition(localScope)) < PD > terminalBlock(localScope) ( < ELSE > terminalBlock(localScope) )? < FI >
+}
+
+void whileBlock(ArrayList <String> localScope):
+{}
+{
+  < WHILE > < PI > condition(localScope) < PD > < DO > terminalBlock(localScope) < OD >
+}
+
+void repeatBlock(ArrayList <String> localScope):
+{}
+{
+  < REPEAT > parameter(localScope, true) terminalBlock(localScope) < PER >
+}
+
+void insBlock(ArrayList <String> localScope):
+{}
+{
+  < IF >
 }
